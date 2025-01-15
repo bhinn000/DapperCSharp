@@ -1,4 +1,5 @@
 using Dapper;
+using DapperC_;
 using DapperC_.Models;
 using Microsoft.Data.SqlClient;
 
@@ -23,17 +24,6 @@ app.UseHttpsRedirection();
 //app.UseAuthorization();
 //app.MapControllers();
 
-app.MapGet("customerRoute" , async (IConfiguration configuration) =>
-{
-    var connectionString = configuration.GetConnectionString("DefaultConnection");
-
-    using var connection = new SqlConnection(connectionString);
-
-    const string query = "select ID, FirstName, LastName, DateofBirth from Customer";
-
-    var customers = await connection.QueryAsync<Customer>(query);
-
-    return Results.Ok(customers);
-});
+app.MapCustomerEndPoints();
 
 app.Run();
