@@ -1,15 +1,17 @@
+using Dapper;
+using DapperC_.Models;
+using Microsoft.Data.SqlClient;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -18,8 +20,20 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
+//app.UseAuthorization();
+//app.MapControllers();
 
-app.MapControllers();
+app.MapGet("customerRoute" , async (IConfiguration configuration) =>
+{
+    var connectionString = configuration.GetConnectionString("DefaultConnection");
+
+    using var connection = new SqlConnection(connectionString);
+
+    const string query = "select ID, FirstName, LastName, DateofBirth from Customer";
+
+    var customers = await connection.QueryAsync<Customer>(query);
+
+    return Results.Ok(customers);
+});
 
 app.Run();
